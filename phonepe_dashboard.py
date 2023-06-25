@@ -8,7 +8,9 @@ import mysql.connector
 import sqlalchemy
 from sqlalchemy import create_engine
 import streamlit as st
+import plotly.express as px
 
+#mysql conncetion
 conn = mysql.connector.connect(host='localhost', user='root', password='BavaPreetha', db='phonepe_pulse')
 cursor = conn.cursor()
 
@@ -32,7 +34,10 @@ if total_data == 'All India':
         in_transaction_1 = cursor.fetchall()
         df_transaction_1 = pd.DataFrame(np.array(in_transaction_1), columns=['State', 'Transaction_amount'])
         st.write(f"Transaction Amount Statewise for '{year_data}' in '{quarter_data}' quarter for '{transaction_type}' ");
-        st.bar_chart(df_transaction_1, x='State', y='Transaction_amount');
+        #st.plotly_chart(df_transaction_1, x='State', y='Transaction_amount');
+        fig = px.scatter(df_transaction_1,x="State",y="Transaction_amount",color_continuous_scale="reds",)
+
+        st.plotly_chart(fig, theme=None, use_container_width=True)
         
         cursor.execute(f"SELECT State, Transaction_count, Transaction_amount FROM aggregated_transaction WHERE Year = '{year_data}' AND Quarter = '{quarter_data}' AND Transaction_type = '{transaction_type}';")
         in_transaction_2 = cursor.fetchall()
@@ -44,13 +49,23 @@ if total_data == 'All India':
         in_transaction_3 = cursor.fetchall()
         df_transaction_3 = pd.DataFrame(np.array(in_transaction_3), columns=['Total','Average'])
         st.write(f"Overall Sum and Average Transaction amount for '{year_data}' in '{quarter_data}' quarter for '{transaction_type}' ");
-        st.write(df_transaction_3['Total'], df_transaction_3['Average']); 
+        #st.write(df_transaction_3['Total']); 
+        #st.write(f"Overall Average Transaction amount for '{year_data}' in '{quarter_data}' quarter for '{transaction_type}' ");
+        #st.write(df_transaction_3['Average']);
+        fig1 = px.scatter(df_transaction_3,color_continuous_scale="reds",)
+        st.plotly_chart(fig1, theme=None, use_container_width=True)
         
+
         cursor.execute(f"SELECT SUM(Transaction_count), AVG(Transaction_count) FROM aggregated_transaction WHERE Year = '{year_data}' AND Quarter = '{quarter_data}' AND Transaction_type = '{transaction_type}';")
         in_transaction_4 = cursor.fetchall()
         df_transaction_4 = pd.DataFrame(np.array(in_transaction_4), columns=['Total','Average'])
         st.write(f"Overall Sum and Average Transaction count for '{year_data}' in '{quarter_data}' quarter for '{transaction_type}' ");
-        st.write(df_transaction_4['Total'], df_transaction_4['Average']);
+        #st.write(df_transaction_4['Total']);
+        #st.write(f"Overall Average Transaction count for '{year_data}' in '{quarter_data}' quarter for '{transaction_type}' ");
+        #st.write(df_transaction_4['Average']);
+        fig2 = px.scatter(df_transaction_4,color_continuous_scale="reds",)
+        st.plotly_chart(fig2, theme=None, use_container_width=True)
+        
   
   with tab2:
         
@@ -65,18 +80,21 @@ if total_data == 'All India':
         in_transaction_5 = cursor.fetchall()
         df_transaction_5 = pd.DataFrame(np.array(in_transaction_5), columns=['State', 'User Count'])
         st.write(f"Transaction User Count Statewise for '{user_year}' in '{user_quarter}' ");
-        st.bar_chart(df_transaction_5, x='State', y='User Count');
+        st.bar_chart(df_transaction_5,  x='User Count',y='State',);
 
         cursor.execute(f"SELECT SUM(User_Count), AVG(User_Count) FROM aggregated_user WHERE Year = '{user_year}' AND Quarter = '{user_quarter}';")
         in_transaction_6 = cursor.fetchall()
         df_transaction_6 = pd.DataFrame(np.array(in_transaction_6), columns=['Total','Average'])
-        st.write(f"Overall Sum and Average user count for '{year_data}' in '{quarter_data}' quarter for '{transaction_type}' ");
-        st.write(df_transaction_6['Total'], df_transaction_6['Average']);
+        st.write(f"Overall Sum and Average user count for '{user_year}' in '{user_quarter}' ");
+        #st.write(df_transaction_6['Total']);
+        #st.write(f"Overall Average user count for '{user_year}' in '{user_quarter}' ");
+        #st.write(df_transaction_6['Average
+        fig3 = px.scatter(df_transaction_6,color_continuous_scale="reds",)
+        st.plotly_chart(fig3, theme=None, use_container_width=True)
     
 
 
 elif total_data =='State wise':
-  st.header(':red[Phonepe Data ]')
   tab3, tab4 = st.tabs(['Transaction','User'])
   with tab3:
 
@@ -101,21 +119,33 @@ elif total_data =='State wise':
         cursor.execute(f"SELECT Transaction_type, Transaction_count, Transaction_amount FROM aggregated_transaction WHERE State = '{state_select}' AND Year = '{state_year}' AND Quarter = '{state_quarter}';")
         in_transaction_8 = cursor.fetchall()
         df_transaction_8 = pd.DataFrame(np.array(in_transaction_8), columns=['Transaction_type','Transaction_count','Transaction_amount'])
-        dst.write(f"Transaction Count transaction type wise '{state_select}' in '{state_year}' quarter '{state_quarter}' ");
+        st.write(f"Transaction Count transaction type wise '{state_select}' in '{state_year}' quarter '{state_quarter}' ");
         st.bar_chart(df_transaction_8, x='Transaction_type', y='Transaction_count');
         st.write(f"Transaction Amount transaction type wise '{state_select}' in '{state_year}' quarter '{state_quarter}' ");
-        st.bar_chart(df_transaction_8, x='Transaction_type', y='Transaction_amount');
+        st.line_chart(df_transaction_8, x='Transaction_type', y='Transaction_amount');
           
         cursor.execute(f"SELECT SUM(Transaction_amount), AVG(Transaction_amount) FROM aggregated_transaction WHERE State = '{state_select}' AND Year = '{state_year}' AND Quarter = '{state_quarter}';")
         in_transaction_9 = cursor.fetchall()
         df_transaction_9 = pd.DataFrame(np.array(in_transaction_9), columns=['Total','Average'])
-        st.write(df_transaction_9)
+        #st.write(df_transaction_9)
+        st.write(f"Overall Sum and Average from Aggregated transaction amount for '{state_select}' in '{state_year}' quarter for '{state_quarter}' ");
+        #st.write(df_transaction_9['Total']);
+        #st.write(f"Overall Average from Aggregated transaction amount for '{state_select}' in '{state_year}' quarter for '{state_quarter}' ");
+        #st.write(df_transaction_9['Average']);
+        fig4 = px.scatter(df_transaction_9,color_continuous_scale="reds",)
+        st.plotly_chart(fig4, theme=None, use_container_width=True)
         
         cursor.execute(f"SELECT SUM(Transaction_count), AVG(Transaction_count) FROM aggregated_transaction WHERE State = '{state_select}' AND Year ='{state_year}' AND Quarter = '{state_quarter}';")
         in_transaction_10 = cursor.fetchall()
         df_transaction_10 = pd.DataFrame(np.array(in_transaction_10), columns=['Total','Average'])
-        st.write(df_transaction_10)
-   
+        #st.write(df_transaction_10);
+        st.write(f"Overall Sum and Average from Aggregated transaction for '{state_select}' in '{state_year}' quarter for '{state_quarter}' ");
+        #st.write(df_transaction_10['Total']);
+        #st.write(f"Overall Average from Aggregated transaction for '{state_select}' in '{state_year}' quarter for '{state_quarter}' ");
+        #st.write(df_transaction_10['Average']);
+        fig5 = px.scatter(df_transaction_10,color_continuous_scale="reds",)
+        st.plotly_chart(fig5, theme=None, use_container_width=True)
+        
   with tab4:
         col5, col6 = st.columns(2)
         with col5:
@@ -130,28 +160,20 @@ elif total_data =='State wise':
         cursor.execute(f"SELECT Quarter, SUM(User_Count) FROM aggregated_user WHERE State = '{state_user_select}' AND Year = '{state_user_year}' GROUP BY Quarter;")
         in_transaction_11 = cursor.fetchall()
         df_transaction_11 = pd.DataFrame(np.array(in_transaction_11), columns=['Quarter', 'User Count'])
-        st.write(df_transaction_11)
+        #st.write(df_transaction_11)
+        st.write(f"User Count from Aggregated user wise '{state_user_select}' in '{state_user_year}'");
+        st.bar_chart(df_transaction_11, x='User Count',y='Quarter',);
            
         cursor.execute(f"SELECT SUM(User_Count), AVG(User_Count) FROM aggregated_user WHERE State = '{state_user_select}' AND Year = '{state_user_year}';")
         in_transaction_12 = cursor.fetchall()
         df_transaction_12 = pd.DataFrame(np.array(in_transaction_12), columns=['Total','Average'])
-        st.write(df_transaction_12)
-        
-        df_transaction_11['Quarter'] = df_transaction_11['Quarter'].astype(int)
-        df_transaction_11['User Count'] = df_transaction_11['User Count'].astype(int)
-        df_transaction_11_fig = px.bar(df_transaction_11 , x = 'Quarter', y ='User Count', color ='User Count', color_continuous_scale = 'thermal', title = 'User Analysis Chart', height = 500,)
-        df_transaction_11_fig.update_layout(title_font=dict(size=33),title_font_color='#6739b7')
-        st.plotly_chart(df_transaction_11_fig,use_container_width=True)
-
-        st.header(':violet[Total calculation]')
-
-        col3, col4 = st.columns(2)
-        with col3:
-            st.subheader('User Analysis')
-            st.dataframe(df_transaction_11)
-        with col4:
-            st.subheader('User Count')
-            st.dataframe(df_transaction_12)
+        #st.write(df_transaction_12)
+        st.write(f"Overall Sum and AVerage from Aggregated user for '{state_user_select}' in '{state_user_year}' ");
+        #st.write(df_transaction_12['Total']);
+        #st.write(f"Overall Average from Aggregated user for '{state_user_select}' in '{state_user_year}' ");
+        #st.write(df_transaction_12['Average']);
+        fig6 = px.scatter(df_transaction_12,color_continuous_scale="reds",)
+        st.plotly_chart(fig6, theme=None, use_container_width=True)
 
        
         
@@ -160,9 +182,7 @@ elif total_data =='State wise':
 
   
 
-        
        
-    
   
     
 else:
@@ -173,12 +193,16 @@ else:
         cursor.execute(f"SELECT State, SUM(Transaction_amount) As Transaction_amount FROM top_transaction WHERE Year = '{top_year}' GROUP BY State ORDER BY Transaction_amount DESC LIMIT 10;")
         in_transaction_13 = cursor.fetchall()
         df_transaction_13 = pd.DataFrame(np.array(in_transaction_13), columns=['State', 'Top Transaction amount'])
-        st.write(df_transaction_13)
+        #st.write(df_transaction_13)
+        st.write(f"Transaction Amonunt from Top transaction in '{top_year}' ");
+        st.bar_chart(df_transaction_13, x='State', y='Top Transaction amount');
         
-		cursor.execute(f"SELECT State, SUM(Transaction_amount) as Transaction_amount, SUM(Transaction_count) as Transaction_count FROM top_transaction WHERE Year = '{top_year}' GROUP BY State ORDER BY Transaction_amount DESC LIMIT 10;")
+        cursor.execute(f"SELECT State, SUM(Transaction_amount) as Transaction_amount, SUM(Transaction_count) as Transaction_count FROM top_transaction WHERE Year = '{top_year}' GROUP BY State ORDER BY Transaction_amount DESC LIMIT 10;")
         in_transaction_14 = cursor.fetchall()
         df_transaction_14 = pd.DataFrame(np.array(in_transaction_14), columns=['State', 'Top Transaction amount','Total Transaction count'])
-        st.write(df_transaction_14)
+        #st.write(df_transaction_14)
+        st.write(f"Transaction COunt from Top transaction in '{top_year}' ");
+        st.bar_chart(df_transaction_14,x='Total Transaction count', y='State');
         
         
   with tab6:
@@ -187,7 +211,9 @@ else:
         cursor.execute(f"SELECT State, SUM(Registered_User) AS Top_user FROM top_user WHERE Year='{top_user_year}' GROUP BY State ORDER BY Top_user DESC LIMIT 10;")
         in_transaction_15 = cursor.fetchall()
         df_transaction_15 = pd.DataFrame(np.array(in_transaction_15), columns=['State', 'Total User count'])
-        st.write(df_transaction_15)
+        #st.write(df_transaction_15)
+        st.write(f"Transaction Count from Top users in '{top_user_year}' ");
+        st.line_chart(df_transaction_15, x='Total User count',y='State');
 
 
 
